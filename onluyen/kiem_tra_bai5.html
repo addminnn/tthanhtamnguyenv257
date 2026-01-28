@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kiểm tra - Bài 5: Câu lệnh lặp while</title>
+
+  <style>
+    :root {
+      --primary-blue: #007bff;
+      --secondary-blue: #0056b3;
+      --bg-light: #f0f4f8;
+      --white: #ffffff;
+      --gray-text: #666;
+      --border-color: #e0e6ed;
+
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      --shadow-soft: 0 6px 18px rgba(15, 23, 42, 0.06);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(900px 500px at 10% 0%, rgba(0,123,255,.12), transparent 55%),
+        radial-gradient(900px 500px at 90% 0%, rgba(99,102,241,.12), transparent 55%),
+        var(--bg-light);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      color: #0f172a;
+    }
+
+    /* Header cố định */
+    header {
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(8px);
+      padding: 14px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      z-index: 1000;
+      border-bottom: 1px solid rgba(224,230,237,.7);
+    }
+
+    h1 { color: var(--primary-blue); font-size: 1.2rem; margin: 0; }
+
+    .timer {
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: #d9534f;
+      background: #fff5f5;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid #ffc1c1;
+      letter-spacing: .2px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .timer small {
+      color: #a11b17;
+      font-weight: 800;
+      opacity: .9;
+    }
+
+    /* Layout 2 cột */
+    .container {
+      max-width: 1200px;
+      margin: 22px auto;
+      padding: 0 18px 40px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .content { min-width: 0; }
+
+    /* Tools */
+    .tools {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 6px 0 14px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .tools .hint {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 700;
+    }
+    .tools .btns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: 1px solid rgba(224,230,237,.95);
+      background: rgba(255,255,255,.85);
+      color: #0f172a;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(0,123,255,.35);
+      background: rgba(0,123,255,.06);
+    }
+    .btn.danger:hover {
+      border-color: rgba(239,68,68,.35);
+      background: rgba(239,68,68,.06);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: sticky;
+      top: 84px; /* thấp hơn header */
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(224,230,237,.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .side-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .side-title h2 {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #334155;
+    }
+
+    .mini-pill {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(224,230,237,.9);
+      background: rgba(0,0,0,.02);
+      color: #475569;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .progress {
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(224,230,237,.9);
+      background: rgba(0,0,0,.02);
+      margin-bottom: 12px;
+    }
+
+    .bar {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+      border: 1px solid rgba(224,230,237,.9);
+    }
+
+    .bar > div {
+      height: 100%;
+      width: 0%;
+      background: rgba(0,123,255,.7);
+      transition: width .25s ease;
+    }
+
+    .progress-meta {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    .legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: #64748b;
+      margin: 10px 0 8px;
+      font-weight: 700;
+    }
+    .dot {
+      width: 10px; height: 10px; border-radius: 999px; display: inline-block;
+      margin-right: 6px;
+      border: 1px solid rgba(15,23,42,.15);
+      vertical-align: -1px;
+    }
+    .dot.todo { background: rgba(148,163,184,.55); }
+    .dot.partial { background: rgba(245,158,11,.70); }
+    .dot.done { background: rgba(34,197,94,.70); }
+
+    .side-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: calc(100vh - 320px);
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .side-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(224,230,237,.9);
+      background: rgba(255,255,255,.7);
+      cursor: pointer;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      user-select: none;
+    }
+    .side-item:hover {
+      background: rgba(0,123,255,.06);
+      border-color: rgba(0,123,255,.35);
+      transform: translateY(-1px);
+    }
+
+    .side-item.active {
+      border-color: rgba(0,123,255,.45);
+      background: rgba(0,123,255,.10);
+    }
+
+    .side-left {
+      display: flex; align-items: center; gap: 10px; min-width: 0;
+    }
+
+    .side-idx {
+      width: 30px; height: 30px;
+      border-radius: 10px;
+      display: grid; place-items: center;
+      font-weight: 900;
+      color: #0f172a;
+      background: rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(224,230,237,.9);
+      flex: 0 0 auto;
+    }
+
+    .side-label {
+      font-size: 13px;
+      font-weight: 900;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 185px;
+    }
+
+    .badge {
+      font-size: 12px;
+      font-weight: 900;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(224,230,237,.9);
+      color: #64748b;
+      background: rgba(0,0,0,.02);
+      flex: 0 0 auto;
+    }
+
+    .side-item[data-status="done"] .badge {
+      color: rgba(21,128,61,.95);
+      border-color: rgba(34,197,94,.35);
+      background: rgba(34,197,94,.10);
+    }
+    .side-item[data-status="partial"] .badge {
+      color: rgba(180,83,9,.95);
+      border-color: rgba(245,158,11,.35);
+      background: rgba(245,158,11,.10);
+    }
+
+    /* Section header */
+    .section-header {
+      background: linear-gradient(135deg, var(--primary-blue), #4f46e5);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 14px;
+      margin: 18px 0 14px;
+      box-shadow: var(--shadow-soft);
+      font-weight: 900;
+      letter-spacing: .2px;
+    }
+
+    .sub-header {
+      margin: 16px 0 10px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(224,230,237,.9);
+      background: rgba(255,255,255,.85);
+      box-shadow: var(--shadow-soft);
+      font-weight: 900;
+      color: #0f172a;
+    }
+
+    /* Thẻ câu hỏi */
+    .question-card {
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(224,230,237,.9);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-soft);
+      transition: transform .08s ease, border-color .2s ease, box-shadow .2s ease;
+      scroll-margin-top: 92px;
+    }
+
+    .question-card:hover {
+      transform: translateY(-1px);
+      border-color: rgba(0,123,255,.25);
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.10);
+    }
+
+    .q-meta {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 800;
+    }
+    .q-meta .tag {
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(224,230,237,.9);
+      background: rgba(0,0,0,.02);
+    }
+
+    .question-num {
+      font-weight: 900;
+      color: var(--primary-blue);
+      margin-right: 6px;
+    }
+
+    .question-text {
+      font-weight: 800;
+      display: block;
+      margin-bottom: 12px;
+      color: #0f172a;
+      white-space: pre-wrap;
+    }
+
+    /* Phần 1: Trắc nghiệm 4 lựa chọn */
+    .options-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .option-item {
+      display: flex;
+      white-space: pre-wrap;
+      align-items: center;
+      padding: 12px 12px;
+      border: 1px solid rgba(224,230,237,.95);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(0,0,0,.01);
+    }
+
+    .option-item:hover {
+      background-color: rgba(0, 123, 255, 0.06);
+      border-color: rgba(0,123,255,.35);
+    }
+
+    .option-item input { margin-right: 12px; width: 18px; height: 18px; }
+
+    /* Phần 2: Đúng/Sai bo tròn */
+    .tf-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(15,23,42,.06);
+      gap: 12px;
+    }
+
+    .tf-row:last-child { border-bottom: none; }
+
+    .tf-label {
+      flex: 1;
+      padding-right: 10px;
+      font-size: 0.95rem;
+      color: #0f172a;
+      white-space: pre-wrap;
+    }
+
+    .tf-options { display: flex; gap: 10px; flex: 0 0 auto; }
+
+    .tf-options input { display: none; }
+
+    .tf-btn {
+      display: inline-block;
+      padding: 8px 16px;
+      border: 2px solid rgba(15,23,42,.10);
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 0.85rem;
+      color: #475569;
+      transition: all 0.2s;
+      text-align: center;
+      min-width: 72px;
+      background: rgba(255,255,255,.7);
+    }
+
+    .tf-btn:hover { border-color: rgba(0,123,255,.40); color: var(--primary-blue); }
+
+    .tf-options input:checked + .tf-btn {
+      background-color: rgba(0,123,255,.12);
+      border-color: rgba(0,123,255,.45);
+      color: #0b3b8a;
+      box-shadow: 0 6px 14px rgba(0, 123, 255, 0.18);
+    }
+
+    /* Nút nộp bài */
+    .btn-submit {
+      display: block;
+      width: 100%;
+      max-width: 320px;
+      margin: 26px auto 0;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--primary-blue), #4f46e5);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 1.05rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform 0.08s ease, filter 0.2s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-submit:hover { filter: brightness(1.05); transform: translateY(-1px); }
+
+    /* Kết quả */
+    #result-box {
+      display: none;
+      text-align: center;
+      background: rgba(0,123,255,.08);
+      padding: 18px;
+      border-radius: var(--radius);
+      margin-top: 16px;
+      border: 2px solid rgba(0,123,255,.35);
+      box-shadow: var(--shadow-soft);
+    }
+
+    /* Responsive */
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; top: auto; }
+      .side-label { max-width: 70vw; }
+      .timer small { display:none; }
+    }
+  
+    /* Hiển thị đúng/sai sau khi nộp bài */
+    .option-item.correct {
+      border-color: rgba(34,197,94,.55) !important;
+      background: rgba(34,197,94,.10) !important;
+    }
+    .option-item.wrong {
+      border-color: rgba(239,68,68,.55) !important;
+      background: rgba(239,68,68,.10) !important;
+    }
+    .answer-note {
+      margin-top: 10px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #0f172a;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(148,163,184,.8);
+      background: rgba(255,255,255,.85);
+    }
+    .answer-note b { color: rgba(21,128,61,.95); }
+
+    .tf-btn.correct {
+      border-color: rgba(34,197,94,.55) !important;
+      background: rgba(34,197,94,.10) !important;
+      color: rgba(21,128,61,.95) !important;
+      box-shadow: 0 6px 14px rgba(34, 197, 94, 0.14);
+    }
+    .tf-btn.wrong {
+      border-color: rgba(239,68,68,.55) !important;
+      background: rgba(239,68,68,.10) !important;
+      color: rgba(153,27,27,.95) !important;
+      box-shadow: 0 6px 14px rgba(239, 68, 68, 0.14);
+    }
+
+  </style>
+</head>
+
+<body>
+<header>
+  <h1 id="pageTitle">Bài 5: Câu lệnh lặp while</h1>
+  <div class="timer">
+    <small id="examMeta">Đề: 0 câu</small>
+    <span id="timer">00:00</span>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+
+    <!-- CỘT TRÁI: NỘI DUNG -->
+    <div class="content">
+
+      <div class="tools">
+        <div class="hint" id="hint">
+          Tip: Bạn có thể bấm vào danh sách câu ở bên phải để nhảy nhanh.
+        </div>
+        <div class="btns">
+          <button class="btn" id="btn-clear">Xoá đáp án</button>
+          <button class="btn danger" id="btn-new">Tạo đề mới</button>
+        </div>
+      </div>
+
+      <div class="section-header" id="part1-title">Phần I: Trắc nghiệm 4 lựa chọn</div>
+      <div id="part1-questions"></div>
+
+      <div class="section-header" id="part2-title">Phần II: Câu hỏi Đúng/Sai</div>
+      <div id="part2-questions"></div>
+
+      <div id="result-box">
+        <h3 style="margin:0 0 8px;">KẾT QUẢ BÀI LÀM</h3>
+        <p id="score-text" style="font-size:2rem;font-weight:900;color:var(--primary-blue);margin:0;"></p>
+        <p id="details-text" style="margin:8px 0 0;color:#334155;font-weight:800;"></p>
+      </div>
+
+      <button class="btn-submit" id="btn-submit" onclick="submitTest()">NỘP BÀI KIỂM TRA</button>
+    </div>
+
+    <!-- CỘT PHẢI: DANH SÁCH CÂU + TRẠNG THÁI -->
+    <aside class="sidebar" aria-label="Danh sách câu hỏi">
+      <div class="side-title">
+        <h2>Danh sách câu</h2>
+        <div class="mini-pill" id="side-pill">0/0</div>
+      </div>
+
+      <div class="progress">
+        <div class="bar"><div id="barFill"></div></div>
+        <div class="progress-meta">
+          <span id="doneTxt">0 đã làm</span>
+          <span id="totalTxt">0 tổng</span>
+        </div>
+      </div>
+
+      <div class="legend">
+        <span><span class="dot todo"></span>Chưa làm</span>
+        <span><span class="dot partial"></span>Đang làm</span>
+        <span><span class="dot done"></span>Đã làm</span>
+      </div>
+
+      <div class="side-list" id="sideList"></div>
+    </aside>
+
+  </div>
+</div>
+
+<script>
+  // =========================
+  // PY10 PRETEST BRIDGE (để khóa/mở phần CODE ở trang chính)
+  // =========================
+  const PY10_SESSION_KEY = "py10:session";
+  function py10GetSession(){
+    try{ return JSON.parse(localStorage.getItem(PY10_SESSION_KEY) || "null"); }catch(_){ return null; }
+  }
+  const __py10Sess = py10GetSession();
+  const __py10Scope = (__py10Sess && __py10Sess.id) ? String(__py10Sess.id).trim() : "guest";
+
+  const PRETEST_ID = "b5";
+  const PRETEST_PASS_SCORE = 1.0; // điểm/10
+  const PRETEST_PASS_KEY = `py10:pretest:${__py10Scope}:${PRETEST_ID}:passed`;
+
+  
+  const PRETEST_RESULT_KEY = `py10:pretest:${__py10Scope}:${PRETEST_ID}:result`;
+
+  // =========================
+  // QUẢN LÝ NÚT "X" THOÁT Ở TRANG CHA (editor_v2.html)
+  // - Mặc định: KHÔNG cho thoát khi đang làm bài.
+  // - Chỉ khi HS bấm "Tạo đề mới" (nạp bài mới) => cho phép thoát 1 lần (cho đến khi HS bắt đầu chọn đáp án).
+  // =========================
+  const _ALLOW_CLOSE_ONCE_KEY = `py10:pretest:${__py10Scope}:${PRETEST_ID}:allowCloseOnce`;
+  function _postCanClose(canClose){
+    try{
+      if(window.parent && window.parent !== window){
+        window.parent.postMessage({
+          type: "py10_pretest_can_close",
+          pretestId: PRETEST_ID,
+          scope: __py10Scope,
+          canClose: !!canClose
+        }, "*");
+      }
+    }catch(e){}
+  }
+  function _consumeAllowCloseOnce(){
+    try{
+      if(sessionStorage.getItem(_ALLOW_CLOSE_ONCE_KEY) === "1"){
+        sessionStorage.removeItem(_ALLOW_CLOSE_ONCE_KEY);
+        return true;
+      }
+    }catch(e){}
+    return false;
+  }
+  function _armAllowCloseOnce(){
+    try{ sessionStorage.setItem(_ALLOW_CLOSE_ONCE_KEY, "1"); }catch(e){}
+  }
+  // Khi vào bài: chỉ cho thoát nếu vừa "nạp bài mới".
+  _postCanClose(_consumeAllowCloseOnce());
+
+  // Lưu kết quả lần nộp gần nhất (kể cả chưa đạt) để giáo viên xem ở trang Kết quả
+  function savePretestResult(payload, opts){
+    try{
+      const o = opts || {};
+      const countAttempt = (o.countAttempt === undefined) ? true : !!o.countAttempt;
+      const prev = (()=>{ try{ return JSON.parse(localStorage.getItem(PRETEST_RESULT_KEY) || "null") || {}; }catch(e){ return {}; } })();
+      const attemptsPrev = Number(prev.attempts||0) || 0;
+      const attempts = attemptsPrev + (countAttempt ? 1 : 0);
+      const ts = (!countAttempt && prev && prev.ts) ? prev.ts : Date.now();
+      // Ghi nhớ "đã đạt" vĩnh viễn + điểm cao nhất, để HS không bị bắt làm lại
+      // chỉ vì lần làm gần nhất chưa đạt.
+      const p = (payload && typeof payload === "object") ? payload : {};
+      const prevBest = (prev && prev.bestScore !== undefined && prev.bestScore !== null) ? Number(prev.bestScore) : null;
+      const curScore  = (p.score !== undefined && p.score !== null) ? Number(p.score) : null;
+      const bestScore = (Number.isFinite(curScore))
+        ? (Number.isFinite(prevBest) ? Math.max(prevBest, curScore) : curScore)
+        : (Number.isFinite(prevBest) ? prevBest : null);
+      const everPassed = !!(prev && (prev.everPassed || prev.passed)) || !!p.passed;
+      const data = Object.assign({}, prev, p, { attempts, ts, bestScore, everPassed });
+      localStorage.setItem(PRETEST_RESULT_KEY, JSON.stringify(data));
+    }catch(e){}
+  }
+
+  // HS bấm "Làm code" => đóng modal ở trang chính (nếu đang mở trong iframe)
+  function goToCode(){
+    try{
+      if(window.parent && window.parent !== window){
+        window.parent.postMessage({ type:"py10_pretest_go_code", pretestId: PRETEST_ID, scope: __py10Scope }, "*");
+        return;
+      }
+    }catch(e){}
+    // Fallback: quay về trang chính
+    try{ window.location.href = "../index.html"; }catch(e){}
+  }
+function markPretestPassed(score10, opts){
+    try{
+      const o = opts || {};
+      const preserveTs = !!o.preserveTs;
+      let prev = null;
+      try{ prev = JSON.parse(localStorage.getItem(PRETEST_PASS_KEY) || "null"); }catch(e){ prev = null; }
+      const ts = (preserveTs && prev && prev.ts) ? prev.ts : Date.now();
+      const payload = { passed:true, score: Number(score10||0), ts };
+      localStorage.setItem(PRETEST_PASS_KEY, JSON.stringify(payload));
+    }catch(e){}
+    // Thông báo cho trang cha (nếu đang mở trong iframe)
+    try{
+      if(window.parent && window.parent !== window){
+        window.parent.postMessage({ type:"py10_pretest_pass", pretestId: PRETEST_ID, scope: __py10Scope, score: Number(score10||0) }, "*");
+      }
+    }catch(e){}
+  }
+
+
+  // =========================
+  // DỮ LIỆU CÂU HỎI (từ Excel)
+  // =========================
+  const MCQ_BANK = [
+  {
+    "id": 1,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 1,
+    "text": "Trong các phát biểu sau, phát biểu nào chưa chính xác?",
+    "options": {
+      "A": "While là lệnh lặp với số lần không biết trước",
+      "B": "For là lệnh lặp với số lần xác định trước",
+      "C": "Khối lệnh lặp while được thực hiện cho đến khi <điều kiện> = False",
+      "D": "While là lệnh lặp với số lần biết trước"
+    },
+    "correct": "D"
+  },
+  {
+    "id": 2,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 2,
+    "text": "Cho đoạn chương trình Python sau:\n\nTong = 0\nwhile Tong < 10:\n    Tong = Tong + 1\n\nSau khi đoạn chương trình trên được thực hiện, Tong nhận giá trị nào?",
+    "options": {
+      "A": "9",
+      "B": "10",
+      "C": "11",
+      "D": "12"
+    },
+    "correct": "B"
+  },
+  {
+    "id": 3,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 3,
+    "text": "Cho biết kết quả của đoạn chương trình dưới đây:\n\na = 10\nwhile a < 11:\n    print(a)",
+    "options": {
+      "A": "Trên màn hình xuất hiện một số 10",
+      "B": "Trên màn hình xuất hiện 10 chữ a",
+      "C": "Trên màn hình xuất hiện một số 11",
+      "D": "Chương trình bị lặp vô tận"
+    },
+    "correct": "D"
+  },
+  {
+    "id": 4,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 4,
+    "text": "Câu lệnh sau giải bài toán nào:\n\nwhile M != N:\n    if M > N:\n        M = M - N\n    else:\n        N = N - M",
+    "options": {
+      "A": "Tìm UCLN của M và N",
+      "B": "Tìm BCNN của M và N.",
+      "C": "Tìm hiệu nhỏ nhất của M và N",
+      "D": "Tìm hiệu lớn nhất của M và N"
+    },
+    "correct": "A"
+  },
+  {
+    "id": 5,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 5,
+    "text": "Tính tổng S = 1 + 2 + 3 + 4 +… + n + … cho đến khi S>10000. Điều kiện nào sau đây cho vòng lặp while là đúng:",
+    "options": {
+      "A": "while S >= 10000:",
+      "B": "while S < 10000:",
+      "C": "while S <= 10000:",
+      "D": "While S >10000"
+    },
+    "correct": "C"
+  },
+  {
+    "id": 6,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 6,
+    "text": "Hãy đưa ra kết quả trong đoạn lệnh sau:\n\nx = 1\nwhile (x <= 5):\n    print(\"python\")\n    x = x + 1",
+    "options": {
+      "A": "5 từ python",
+      "B": "4 từ python",
+      "C": "3 từ python",
+      "D": "Không có kết quả"
+    },
+    "correct": "A"
+  },
+  {
+    "id": 7,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 7,
+    "text": "Cho đoạn chương trình sau:\n\nn = int(input(\"Nhập n<=1000: \"))\nk = 0\nn = abs(n)\nwhile n != 0:\n    n = n // 10\n    k = k + 1\nprint(k)\n\nChương trình có ý nghĩa gì?",
+    "options": {
+      "A": "k là số chữ số có nghĩa của n",
+      "B": "k là chữ số hàng đơn vị của n",
+      "C": "k là chữ số khác 0 lớn nhất của n",
+      "D": "k là số chữ số khác 0 của n"
+    },
+    "correct": "A"
+  },
+  {
+    "id": 8,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 8,
+    "text": "Chọn đáp án đúng nhất:\n\ni = 0\nx = 0\nwhile i < 10:\n    if i % 2 == 0:\n        x += 1\n    i += 1\nprint(x)",
+    "options": {
+      "A": "2",
+      "B": "3",
+      "C": "4",
+      "D": "5"
+    },
+    "correct": "D"
+  },
+  {
+    "id": 9,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 9,
+    "text": "Trong các phát biểu sau, phát biểu nào sai?",
+    "options": {
+      "A": "Có ba cấu trúc lập trình cơ bản của các ngôn ngữ lập trình",
+      "B": "Cấu trúc tuần tự gồm các khối lệnh được thực hiện theo trình tự từ trên xuống dưới",
+      "C": "Khối lệnh chỉ được thực hiện tuỳ thuộc điều kiện nào đó được thể hiện bằng câu lệnh for, while",
+      "D": "Cả ba phương án trên đều đúng"
+    },
+    "correct": "C"
+  },
+  {
+    "id": 10,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 10,
+    "text": "Vòng lặp while – do kết thúc khi nào?",
+    "options": {
+      "A": "Khi một số điều kiện cho trước không còn thoả mãn",
+      "B": "Khi đủ số vòng lặp",
+      "C": "Khi tìm được output",
+      "D": "Tất cả các phương án"
+    },
+    "correct": "A"
+  },
+  {
+    "id": 11,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 11,
+    "text": "Mọi quá trình tính toán đều có thể mô tả và thực hiện dựa trên cấu trúc cơ bản là:",
+    "options": {
+      "A": "Cấu trúc tuần tự",
+      "B": "Cấu trúc rẽ nhánh",
+      "C": "Cấu trúc lặp",
+      "D": "Cả ba cấu trúc"
+    },
+    "correct": "D"
+  },
+  {
+    "id": 12,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 12,
+    "text": "Hoạt động nào sau đây lặp với số lần lặp chưa biết trước?",
+    "options": {
+      "A": "Ngày tắm hai lần",
+      "B": "Học bài cho tới khi thuộc bài",
+      "C": "Mỗi tuần đi nhà sách một lần",
+      "D": "Ngày đánh răng hai lần"
+    },
+    "correct": "B"
+  },
+  {
+    "id": 13,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 13,
+    "text": "Cú pháp lệnh lặp với số lần chưa biết trước trong Python:",
+    "options": {
+      "A": "while <điều kiện> to <câu lệnh>",
+      "B": "while <điều kiện> to <câu lệnh1> do<câu lệnh 2>",
+      "C": "while <điều kiện> do: <câu lệnh>",
+      "D": "while <điều kiện>: <câu lệnh>"
+    },
+    "correct": "D"
+  },
+  {
+    "id": 14,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 14,
+    "text": "Kết quả của chương trình sau:\n\nx = 1\ny = 5\nwhile x < y:\n    print(x, end=\" \")\n    x = x + 1",
+    "options": {
+      "A": "1 2 3 4",
+      "B": "2 3 4 5",
+      "C": "1 2 3 4 5",
+      "D": "2 3 4"
+    },
+    "correct": "A"
+  },
+  {
+    "id": 15,
+    "section": "Bài 5: Câu lệnh lặp while",
+    "no": 15,
+    "text": "Kết quả của chương trình sau là gì?\n\nx = 8\ny = 2\nwhile y < x:\n    x = x - 2\n    print(x, end=\" \")",
+    "options": {
+      "A": "8, 6, 4, 2",
+      "B": "8, 6, 4",
+      "C": "6, 4, 2",
+      "D": "8, 6, 4, 2, 0"
+    },
+    "correct": "C"
+  }
+];
+  const TF_BANK = [
+  {
+    "id": 1,
+    "topic": "Bài 5: Câu lệnh lặp while (Đúng/Sai)",
+    "no": 1,
+    "text": "Cho đoạn thông tin: Câu lệnh lặp while trong Python cho phép thực hiện một khối lệnh nhiều lần miễn là điều kiện được cung cấp là đúng. Câu lệnh này thường được sử dụng khi số lần lặp không được xác định trước.",
+    "items": [
+      {
+        "key": "a",
+        "text": "Câu lệnh lặp while chỉ thực hiện một lần nếu điều kiện là đúng",
+        "correct": "S"
+      },
+      {
+        "key": "b",
+        "text": "Câu lệnh lặp while có thể gây ra vòng lặp vô hạn nếu điều kiện không bao giờ trở thành sai",
+        "correct": "D"
+      },
+      {
+        "key": "c",
+        "text": "Câu lệnh while có thể được sử dụng để lặp qua danh sách trong Python",
+        "correct": "D"
+      },
+      {
+        "key": "d",
+        "text": "Điều kiện trong câu lệnh while là một biểu thức có giá trị logic (True hoặc False)",
+        "correct": "D"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "topic": "Bài 5: Câu lệnh lặp while (Đúng/Sai)",
+    "no": 2,
+    "text": "Cho đoạn thông tin: Câu lệnh lặp while có cú pháp đơn giản: while điều_kiện: theo sau là khối lệnh cần thực hiện. Nếu điều kiện trở thành sai, vòng lặp sẽ kết thúc.",
+    "items": [
+      {
+        "key": "a",
+        "text": "Cú pháp của câu lệnh while yêu cầu phải có dấu hai chấm ở cuối dòng điều kiện",
+        "correct": "D"
+      },
+      {
+        "key": "b",
+        "text": "Vòng lặp while không thể kết thúc nếu điều kiện luôn đúng",
+        "correct": "D"
+      },
+      {
+        "key": "c",
+        "text": "Khối mã bên trong câu lệnh while có thể không cần phải thụt lề",
+        "correct": "S"
+      },
+      {
+        "key": "d",
+        "text": "Câu lệnh while không thể được lồng vào nhau",
+        "correct": "S"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "topic": "Bài 5: Câu lệnh lặp while (Đúng/Sai)",
+    "no": 3,
+    "text": "Câu lệnh lặp while cho phép thực hiện một khối lệnh nhiều lần khi điều kiện còn đúng",
+    "items": [
+      {
+        "key": "a",
+        "text": "Vòng lặp while chỉ kiểm tra điều kiện một lần trước khi thực hiện",
+        "correct": "S"
+      },
+      {
+        "key": "b",
+        "text": "Nếu điều kiện ban đầu sai, khối lệnh trong while sẽ không được thực hiện lần nào",
+        "correct": "D"
+      },
+      {
+        "key": "c",
+        "text": "Điều kiện trong câu lệnh while được kiểm tra trước mỗi lần lặp",
+        "correct": "D"
+      },
+      {
+        "key": "d",
+        "text": "Câu lệnh while luôn thực hiện ít nhất một lần",
+        "correct": "S"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "topic": "Bài 5: Câu lệnh lặp while (Đúng/Sai)",
+    "no": 4,
+    "text": "Xét đoạn chương trình sau: i = 1 while i <= 3: print(i) i += 1",
+    "items": [
+      {
+        "key": "a",
+        "text": "Vòng lặp while được thực hiện 3 lần",
+        "correct": "D"
+      },
+      {
+        "key": "b",
+        "text": "Chương trình in ra các số 1, 2, 3",
+        "correct": "D"
+      },
+      {
+        "key": "c",
+        "text": "Nếu bỏ dòng i += 1, chương trình sẽ bị lặp vô hạn",
+        "correct": "D"
+      },
+      {
+        "key": "d",
+        "text": "Giá trị cuối cùng của biến i sau khi kết thúc vòng lặp là 3",
+        "correct": "S"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "topic": "Bài 5: Câu lệnh lặp while (Đúng/Sai)",
+    "no": 5,
+    "text": "So sánh vòng lặp for và while trong Python:",
+    "items": [
+      {
+        "key": "a",
+        "text": "Vòng lặp while luôn thay thế được hoàn toàn vòng lặp for",
+        "correct": "S"
+      },
+      {
+        "key": "b",
+        "text": "Vòng lặp while có thể sử dụng biến đếm để kiểm soát số lần lặp",
+        "correct": "D"
+      },
+      {
+        "key": "c",
+        "text": "Vòng lặp while không thể duyệt qua các phần tử của danh sách",
+        "correct": "S"
+      },
+      {
+        "key": "d",
+        "text": "Vòng lặp while linh hoạt hơn for trong việc kiểm soát điều kiện lặp",
+        "correct": "D"
+      }
+    ]
+  }
+];
+
+  // =========================
+  // CẤU HÌNH ĐỀ KIỂM TRA
+  // =========================
+  const CONFIG = {
+    // Số câu cho đề (đặt null để lấy TẤT CẢ)
+    mcqCount: 15,  // ví dụ: 15 câu trắc nghiệm
+    tfCount: 5,    // ví dụ: 5 câu đúng/sai (mỗi câu có 4 ý a,b,c,d)
+
+    // Trộn đề ngẫu nhiên hay không
+    shuffle: true,
+
+    // Thời gian làm bài (phút). Đặt null để tự động = số câu (mcq + tf)
+    durationMinutes: null,
+
+    // Lưu đề + đáp án vào localStorage (refresh không mất)
+    persistExam: true,
+    persistAnswers: true,
+  };
+// IMPORTANT: STORAGE_KEY is scoped by account + PRETEST_ID to avoid mixing results between users.
+// (Fix) Previously this key was global, causing "already has results" for new logins on the same browser.
+const STORAGE_KEY = `py10:pretest:${__py10Scope}:${PRETEST_ID}:exam_state_v1`;
+  // =========================
+  // STATE (localStorage)
+  // =========================
+  function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const st = JSON.parse(raw);
+    if (!st || typeof st !== "object") return null;
+
+    // Safety: ensure the restored state belongs to the current account/pretest.
+    // This prevents "seeing results without doing the quiz" when multiple accounts share one browser.
+    if (st.__scope && String(st.__scope) !== String(__py10Scope)) return null;
+    if (st.__pretestId && String(st.__pretestId) !== String(PRETEST_ID)) return null;
+
+    return st;
+  } catch (e) {
+    return null;
+  }
+}
+
+  function saveState(state) {
+  try {
+    if (state && typeof state === "object") {
+      state.__scope = String(__py10Scope);
+      state.__pretestId = String(PRETEST_ID);
+      state.__updatedAt = Date.now();
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {}
+}
+
+  function normalizeCount(count, max) {
+    if (count === null || count === undefined) return max;
+    const n = Number(count);
+    if (!Number.isFinite(n) || n <= 0) return max;
+    return Math.min(Math.floor(n), max);
+  }
+
+  function shuffleInPlace(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function pickByIds(bank, ids) {
+    const map = new Map(bank.map(q => [q.id, q]));
+    return ids.map(id => map.get(id)).filter(Boolean);
+  }
+
+  function pickExamFromBank() {
+    const desiredMcq = normalizeCount(CONFIG.mcqCount, MCQ_BANK.length);
+    const desiredTf  = normalizeCount(CONFIG.tfCount, TF_BANK.length);
+
+    const state = (CONFIG.persistExam || CONFIG.persistAnswers) ? (loadState() || {}) : {};
+
+    // Nếu có đề đã lưu và hợp lệ thì dùng lại
+    if (CONFIG.persistExam && state.exam && Array.isArray(state.exam.mcqIds) && Array.isArray(state.exam.tfIds)) {
+      const mcqIds = state.exam.mcqIds;
+      const tfIds  = state.exam.tfIds;
+
+      const validLen = (mcqIds.length === desiredMcq) && (tfIds.length === desiredTf);
+      const validIds =
+        mcqIds.every(id => MCQ_BANK.some(q => q.id === id)) &&
+        tfIds.every(id  => TF_BANK.some(q => q.id === id));
+
+      if (validLen && validIds) {
+        return {
+          state,
+          mcq: pickByIds(MCQ_BANK, mcqIds),
+          tf:  pickByIds(TF_BANK, tfIds),
+        };
+      }
+    }
+
+    // Tạo đề mới
+    const mcqPool = MCQ_BANK.slice();
+    const tfPool  = TF_BANK.slice();
+
+    if (CONFIG.shuffle) {
+      shuffleInPlace(mcqPool);
+      shuffleInPlace(tfPool);
+    }
+
+    const mcq = mcqPool.slice(0, desiredMcq);
+    const tf  = tfPool.slice(0, desiredTf);
+
+    if (CONFIG.persistExam || CONFIG.persistAnswers) {
+      state.exam = {
+        mcqIds: mcq.map(q => q.id),
+        tfIds: tf.map(q => q.id),
+      };
+      state.answers = state.answers || {};
+      state.submitted = false;
+      saveState(state);
+    }
+
+    return { state, mcq, tf };
+  }
+
+  // =========================
+  // RENDER QUESTIONS
+  // =========================
+  const part1El = document.getElementById("part1-questions");
+  const part2El = document.getElementById("part2-questions");
+  const part1Title = document.getElementById("part1-title");
+  const part2Title = document.getElementById("part2-title");
+  const examMeta = document.getElementById("examMeta");
+
+  function el(tag, className, text) {
+    const e = document.createElement(tag);
+    if (className) e.className = className;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+
+  function renderMCQ(mcqList) {
+    part1El.innerHTML = "";
+
+    // Group theo section để nhìn dễ
+    const groups = new Map();
+    for (const q of mcqList) {
+      const key = q.section || "Trắc nghiệm";
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(q);
+    }
+
+    let idx = 0;
+    for (const [section, qs] of groups.entries()) {
+      const sub = el("div", "sub-header", section);
+      part1El.appendChild(sub);
+
+      for (const q of qs) {
+        idx++;
+        const card = el("div", "question-card");
+        card.id = `mcq-${q.id}`;
+        card.dataset.sideLabel = `TN ${idx}`;
+        card.dataset.sideDesc = (q.text || "").slice(0, 60);
+
+        const meta = el("div", "q-meta");
+        meta.appendChild(el("span", "tag", `Mã: MCQ-${q.id}`));
+        card.appendChild(meta);
+
+        const qt = el("span", "question-text");
+        const num = el("span", "question-num", `Câu ${idx}:`);
+        qt.appendChild(num);
+        qt.appendChild(document.createTextNode(" " + (q.text || "")));
+        card.appendChild(qt);
+
+        const optList = el("div", "options-list");
+        const name = `mcq_${q.id}`;
+
+        for (const key of ["A","B","C","D"]) {
+          const label = el("label", "option-item");
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = name;
+          input.value = key;
+
+          const span = document.createTextNode(` ${key}. ${q.options[key] || ""}`);
+          label.appendChild(input);
+          label.appendChild(span);
+
+          optList.appendChild(label);
+        }
+
+        card.appendChild(optList);
+        part1El.appendChild(card);
+      }
+    }
+
+    part1Title.textContent = `Phần I: Trắc nghiệm 4 lựa chọn (${mcqList.length} câu)`;
+  }
+
+  function renderTF(tfList) {
+    part2El.innerHTML = "";
+
+    const groups = new Map();
+    for (const q of tfList) {
+      const key = q.topic || "Đúng/Sai";
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(q);
+    }
+
+    let idx = 0;
+    for (const [topic, qs] of groups.entries()) {
+      const sub = el("div", "sub-header", topic);
+      part2El.appendChild(sub);
+
+      for (const q of qs) {
+        idx++;
+        const card = el("div", "question-card");
+        card.id = `tf-${q.id}`;
+        card.dataset.sideLabel = `ĐS ${idx}`;
+        card.dataset.sideDesc = (q.text || "").slice(0, 60);
+
+        const meta = el("div", "q-meta");
+        meta.appendChild(el("span", "tag", `Mã: TF-${q.id}`));
+        card.appendChild(meta);
+
+        const qt = el("span", "question-text");
+        const num = el("span", "question-num", `Câu ${idx}:`);
+        qt.appendChild(num);
+        qt.appendChild(document.createTextNode(" " + (q.text || "")));
+        card.appendChild(qt);
+
+        // Items a,b,c,d
+        const items = Array.isArray(q.items) ? q.items : [];
+        for (const it of items) {
+          const row = el("div", "tf-row");
+
+          const label = el("div", "tf-label", `${it.key}) ${it.text || ""}`);
+          row.appendChild(label);
+
+          const opt = el("div", "tf-options");
+          const name = `tf_${q.id}_${it.key}`;
+
+          // Đúng
+          {
+            const wrap = document.createElement("label");
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = name;
+            input.value = "D";
+            const btn = el("span", "tf-btn", "Đúng");
+            wrap.appendChild(input);
+            wrap.appendChild(btn);
+            opt.appendChild(wrap);
+          }
+          // Sai
+          {
+            const wrap = document.createElement("label");
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = name;
+            input.value = "S";
+            const btn = el("span", "tf-btn", "Sai");
+            wrap.appendChild(input);
+            wrap.appendChild(btn);
+            opt.appendChild(wrap);
+          }
+
+          row.appendChild(opt);
+          card.appendChild(row);
+        }
+
+        part2El.appendChild(card);
+      }
+    }
+
+    part2Title.textContent = `Phần II: Câu hỏi Đúng/Sai (${tfList.length} câu)`;
+  }
+
+  function applySavedAnswers(state) {
+    if (!CONFIG.persistAnswers || !state || !state.answers) return;
+    const answers = state.answers;
+
+    for (const name in answers) {
+      const value = answers[name];
+      const inputs = document.querySelectorAll(`input[type="radio"][name="${name}"]`);
+      inputs.forEach(inp => {
+        if (inp.value === value) inp.checked = true;
+      });
+    }
+  }
+
+  // =========================
+  // SIDEBAR + PROGRESS
+  // =========================
+  const sideList = document.getElementById('sideList');
+  const sidePill = document.getElementById('side-pill');
+  const barFill = document.getElementById('barFill');
+  const doneTxt = document.getElementById('doneTxt');
+  const totalTxt = document.getElementById('totalTxt');
+
+  function getQuestionLabel(card, index) {
+    const title = card.dataset.sideLabel || `Câu ${index + 1}`;
+    const desc  = card.dataset.sideDesc || "";
+    return { title, desc };
+  }
+
+  function escAttr(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+
+  function getCardStatus(card) {
+    const radios = Array.from(card.querySelectorAll('input[type="radio"]'));
+    if (radios.length === 0) return 'todo';
+
+    const names = Array.from(new Set(radios.map(r => r.name).filter(Boolean)));
+    if (names.length === 0) return 'todo';
+
+    let answered = 0;
+    for (const name of names) {
+      const checked = card.querySelector(`input[type="radio"][name="${name}"]:checked`);
+      if (checked) answered++;
+    }
+
+    if (answered === 0) return 'todo';
+    if (answered < names.length) return 'partial';
+    return 'done';
+  }
+
+  function buildSidebar() {
+    const cards = Array.from(document.querySelectorAll('.question-card'));
+
+    sideList.innerHTML = cards.map((card, idx) => {
+      if (!card.id) card.id = `qcard-${idx + 1}`;
+      const { title, desc } = getQuestionLabel(card, idx);
+      const status = getCardStatus(card);
+      const badgeText = status === 'done' ? 'Đã làm' : (status === 'partial' ? 'Đang làm' : 'Chưa làm');
+
+      return `
+        <div class="side-item" data-target="${card.id}" data-status="${status}" title="${escAttr(desc)}">
+          <div class="side-left">
+            <div class="side-idx">${idx + 1}</div>
+            <div class="side-label">${title}</div>
+          </div>
+          <div class="badge">${badgeText}</div>
+        </div>
+      `;
+    }).join('');
+
+    updateProgress();
+    setupActiveObserver();
+  }
+
+  function updateProgress() {
+    const items = Array.from(sideList.querySelectorAll('.side-item'));
+    const cards = items.map(it => document.getElementById(it.dataset.target)).filter(Boolean);
+
+    let doneCount = 0;
+    cards.forEach((card, i) => {
+      const status = getCardStatus(card);
+      const item = items[i];
+      if (!item) return;
+
+      item.dataset.status = status;
+      const badge = item.querySelector('.badge');
+      if (badge) badge.textContent = status === 'done' ? 'Đã làm' : (status === 'partial' ? 'Đang làm' : 'Chưa làm');
+      if (status === 'done') doneCount++;
+    });
+
+    const total = cards.length || 0;
+    const pct = total ? Math.round((doneCount / total) * 100) : 0;
+
+    sidePill.textContent = `${doneCount}/${total}`;
+    doneTxt.textContent = `${doneCount} đã làm`;
+    totalTxt.textContent = `${total} tổng`;
+    barFill.style.width = `${pct}%`;
+  }
+
+  // Highlight item đang nhìn
+  let observer = null;
+  function setupActiveObserver() {
+    if (observer) observer.disconnect();
+    const items = Array.from(sideList.querySelectorAll('.side-item'));
+    const map = new Map(items.map(it => [it.dataset.target, it]));
+    const cards = Array.from(document.querySelectorAll('.question-card'));
+
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.id;
+        items.forEach(it => it.classList.remove('active'));
+        const it = map.get(id);
+        if (it) it.classList.add('active');
+      });
+    }, {
+      root: null,
+      threshold: 0.25
+    });
+
+    cards.forEach(c => observer.observe(c));
+  }
+
+  // Nhảy tới câu khi click sidebar
+  document.addEventListener('click', (e) => {
+    const item = e.target.closest('.side-item[data-target]');
+    if (!item) return;
+    const id = item.dataset.target;
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // =========================
+  // TIMER
+  // =========================
+  let timeLeft = 0;
+  const timerDisplay = document.getElementById('timer');
+  let countdown = null;
+
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  }
+
+  function startTimer(totalMinutes) {
+    timeLeft = Math.max(0, Math.floor(totalMinutes * 60));
+    timerDisplay.textContent = formatTime(timeLeft);
+
+    if (countdown) clearInterval(countdown);
+    countdown = setInterval(() => {
+      timerDisplay.textContent = formatTime(timeLeft);
+
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        alert("Hết giờ! Hệ thống sẽ tự động nộp bài.");
+        submitTest();
+        return;
+      }
+      timeLeft--;
+    }, 1000);
+  }
+
+  // =========================
+  // SUBMIT & SCORING
+  // =========================
+  let EXAM = null; // { state, mcq, tf }
+
+  function submitTest(fromRestore = false) {
+    if (!EXAM) return;
+    if (countdown) clearInterval(countdown);
+
+    const mcqList = EXAM.mcq;
+    const tfList  = EXAM.tf;
+
+    let mcqCorrect = 0;
+    let mcqAnswered = 0;
+
+    for (const q of mcqList) {
+      const name = `mcq_${q.id}`;
+      const checked = document.querySelector(`input[name="${name}"]:checked`);
+      if (checked) {
+        mcqAnswered++;
+        if (checked.value === q.correct) mcqCorrect++;
+      }
+    }
+
+    let tfItemsTotal = 0;
+    let tfItemsCorrect = 0;
+    let tfItemsAnswered = 0;
+
+    // Mỗi câu Đ/S quy về 1 điểm (chia đều theo số ý của câu đó)
+    let tfPointsTotal = 0;
+    let tfPointsEarned = 0;
+
+    for (const q of tfList) {
+      const items = Array.isArray(q.items) ? q.items : [];
+      if (!items.length) continue;
+
+      tfPointsTotal += 1;
+      const perItem = 1 / items.length;
+
+      for (const it of items) {
+        tfItemsTotal++;
+        const name = `tf_${q.id}_${it.key}`;
+        const checked = document.querySelector(`input[name="${name}"]:checked`);
+        if (checked) {
+          tfItemsAnswered++;
+          if (checked.value === it.correct) {
+            tfItemsCorrect++;
+            tfPointsEarned += perItem;
+          }
+        }
+      }
+    }
+
+    // Quy đổi điểm:
+    // - Mỗi câu trắc nghiệm đúng = 1 điểm
+    // - Mỗi câu đúng/sai đúng tối đa = 1 điểm (tính theo số ý đúng)
+    const totalPoints = mcqList.length + tfPointsTotal;
+    const earnedPoints = mcqCorrect + tfPointsEarned;
+    const score10 = totalPoints ? (earnedPoints / totalPoints) * 10 : 0;
+
+    const passed = score10 >= PRETEST_PASS_SCORE;
+
+    // Lưu kết quả (kể cả chưa đạt) để GV xem trong trang Kết quả
+    try{
+      savePretestResult({
+        passed: !!passed,
+        score: Number(score10||0),
+        detail: {
+          mcqCorrect: mcqCorrect,
+          mcqTotal: mcqList.length,
+          mcqAnswered: mcqAnswered,
+          tfItemsCorrect: tfItemsCorrect,
+          tfItemsTotal: tfItemsTotal,
+          tfItemsAnswered: tfItemsAnswered
+        }
+      }, { countAttempt: !fromRestore });
+    }catch(e){}
+
+    // Hiển thị kết quả
+    document.getElementById('btn-submit').style.display = 'none';
+    const resultBox = document.getElementById('result-box');
+    resultBox.style.display = 'block';
+
+    document.getElementById('score-text').innerText = score10.toFixed(2) + " Điểm";
+    document.getElementById('details-text').innerText =
+      `Trắc nghiệm: đúng ${mcqCorrect}/${mcqList.length} (đã làm ${mcqAnswered}/${mcqList.length}) • ` +
+      `Đúng/Sai: đúng ${tfItemsCorrect}/${tfItemsTotal} ý (đã làm ${tfItemsAnswered}/${tfItemsTotal} ý)`;
+
+    // Khóa chọn sau khi nộp
+    document.querySelectorAll('input[type="radio"]').forEach(i => i.disabled = true);
+
+    // Hiển thị đáp án đúng/sai trực quan
+    revealAnswers();
+
+    // Lưu trạng thái submitted
+    if (CONFIG.persistExam || CONFIG.persistAnswers) {
+      EXAM.state.submitted = true;
+      saveState(EXAM.state);
+    }
+
+        // =========================
+    // PY10 PRETEST NOTE: Đạt yêu cầu => mở khóa phần CODE ở trang chính
+    // =========================
+    try{
+      const old = document.getElementById("pretestNote");
+      if(old) old.remove();
+      const note = document.createElement("div");
+      note.id = "pretestNote";
+      note.style.marginTop = "10px";
+      note.style.fontSize = "12px";
+      note.style.fontWeight = "900";
+      if(score10 >= PRETEST_PASS_SCORE){
+        note.style.color = "#0f172a";
+        note.innerHTML = `✅ Bạn đã đạt yêu cầu (≥ ${PRETEST_PASS_SCORE.toFixed(1)} điểm). Bấm <b>“LÀM CODE”</b> bên dưới để bắt đầu.`;
+        markPretestPassed(score10, { preserveTs: fromRestore });
+      }else{
+        note.style.color = "#b00020";
+        note.innerHTML = `❌ Chưa đạt yêu cầu (cần ≥ ${PRETEST_PASS_SCORE.toFixed(1)} điểm). Hãy bấm “Tạo đề mới” để làm lại.`;
+      }
+      resultBox.appendChild(note);
+    }catch(e){}
+
+    // Nếu đã đạt yêu cầu, hiển thị nút "Làm code" để HS chủ động quay lại phần code
+    try{
+      const oldBtn = document.getElementById("btnGoCode");
+      if(oldBtn) oldBtn.remove();
+      if(passed){
+        const btn = document.createElement("button");
+        btn.id = "btnGoCode";
+        btn.className = "btn-submit";
+        btn.style.marginTop = "12px";
+        btn.style.background = "linear-gradient(135deg, #16a34a, #22c55e)";
+        btn.textContent = "LÀM CODE";
+        btn.onclick = goToCode;
+        resultBox.appendChild(btn);
+      }
+    }catch(e){}
+
+updateProgress();
+    if (!fromRestore) window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+
+  
+  // =========================
+  // HIỂN THỊ ĐÁP ÁN (sau khi nộp)
+  // =========================
+  function clearReveal() {
+    document.querySelectorAll('.option-item.correct, .option-item.wrong').forEach(el => {
+      el.classList.remove('correct', 'wrong');
+    });
+    document.querySelectorAll('.tf-btn.correct, .tf-btn.wrong').forEach(el => {
+      el.classList.remove('correct', 'wrong');
+    });
+    document.querySelectorAll('.answer-note').forEach(el => el.remove());
+  }
+
+  function revealAnswers() {
+    if (!EXAM) return;
+
+    // MCQ: tô màu đáp án đúng + đáp án chọn sai (nếu có)
+    for (const q of EXAM.mcq) {
+      const card = document.getElementById(`mcq-${q.id}`);
+      if (!card) continue;
+
+      const correct = q.correct;
+
+      // mark correct option
+      card.querySelectorAll('input[type="radio"]').forEach(inp => {
+        const label = inp.closest('label');
+        if (!label) return;
+        if (inp.value === correct) label.classList.add('correct');
+      });
+
+      // mark wrong chosen
+      const chosen = card.querySelector(`input[name="mcq_${q.id}"]:checked`);
+      if (chosen && chosen.value !== correct) {
+        const label = chosen.closest('label');
+        if (label) label.classList.add('wrong');
+      }
+
+      // show note
+      let note = card.querySelector('.answer-note');
+      if (!note) {
+        note = document.createElement('div');
+        note.className = 'answer-note';
+        card.appendChild(note);
+      }
+      note.innerHTML = `Đáp án đúng: <b>${correct}</b>`;
+    }
+
+    // TF: tô màu nút Đ/S đúng và tô màu lựa chọn sai (nếu có)
+    for (const q of EXAM.tf) {
+      const card = document.getElementById(`tf-${q.id}`);
+      if (!card) continue;
+
+      const items = Array.isArray(q.items) ? q.items : [];
+      for (const it of items) {
+        const name = `tf_${q.id}_${it.key}`;
+        const correctVal = it.correct;
+
+        const correctInput = card.querySelector(`input[name="${name}"][value="${correctVal}"]`);
+        if (correctInput && correctInput.nextElementSibling) {
+          correctInput.nextElementSibling.classList.add('correct');
+        }
+
+        const chosen = card.querySelector(`input[name="${name}"]:checked`);
+        if (chosen && chosen.value !== correctVal) {
+          if (chosen.nextElementSibling) chosen.nextElementSibling.classList.add('wrong');
+        }
+      }
+    }
+  }
+
+// =========================
+  // EVENTS: lưu đáp án + nút tiện ích
+  // =========================
+  document.addEventListener('change', (e) => {
+    if (e.target && e.target.matches('input[type="radio"]')) {
+      // Đang làm bài => khoá nút thoát
+      _postCanClose(false);
+      if (CONFIG.persistAnswers && EXAM && EXAM.state) {
+        EXAM.state.answers = EXAM.state.answers || {};
+        EXAM.state.answers[e.target.name] = e.target.value;
+        saveState(EXAM.state);
+      }
+      updateProgress();
+    }
+  });
+
+  document.getElementById("btn-new").addEventListener("click", () => {
+    // tạo đề mới: xoá localStorage và reload
+    // Cho phép thoát ngay sau khi nạp đề mới xong (1 lần)
+    _armAllowCloseOnce();
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  });
+
+  document.getElementById("btn-clear").addEventListener("click", () => {
+    // xoá đáp án nhưng giữ đề
+    if (CONFIG.persistAnswers && EXAM && EXAM.state) {
+      EXAM.state.answers = {};
+      EXAM.state.submitted = false;
+      saveState(EXAM.state);
+    }
+    document.querySelectorAll('input[type="radio"]').forEach(i => {
+      i.checked = false;
+      i.disabled = false;
+    });
+    clearReveal();
+    document.getElementById('btn-submit').style.display = 'block';
+    document.getElementById('result-box').style.display = 'none';
+    if (countdown) clearInterval(countdown);
+
+    // restart timer
+    const autoMinutes = (CONFIG.durationMinutes === null || CONFIG.durationMinutes === undefined)
+      ? (EXAM.mcq.length + EXAM.tf.length)
+      : Number(CONFIG.durationMinutes);
+
+    startTimer(autoMinutes);
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // =========================
+  // INIT
+  // =========================
+  function init() {
+    EXAM = pickExamFromBank();
+
+    // Render
+    renderMCQ(EXAM.mcq);
+    renderTF(EXAM.tf);
+
+    // Meta header
+    const totalCards = EXAM.mcq.length + EXAM.tf.length;
+    examMeta.textContent = `Bài 5 • ${totalCards} câu`;
+
+    // Apply answers
+    applySavedAnswers(EXAM.state);
+
+    // Sidebar
+    buildSidebar();
+    updateProgress();
+
+    // Timer (auto theo số câu nếu durationMinutes = null)
+    const minutes = (CONFIG.durationMinutes === null || CONFIG.durationMinutes === undefined)
+      ? (EXAM.mcq.length + EXAM.tf.length)
+      : Number(CONFIG.durationMinutes);
+
+    // Nếu đã submit trước đó => tự hiển thị lại kết quả (không chạy timer)
+    if (EXAM.state && EXAM.state.submitted) {
+      timerDisplay.textContent = "Đã nộp";
+      submitTest(true);
+      return;
+    }
+
+    startTimer(minutes);
+  }
+
+  init();
+</script>
+</body>
+</html>
